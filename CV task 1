@@ -1,0 +1,163 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOpL5T75Wk0gh0FZeCcQ2pB",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sanjaysivanathan88-maker/CV-colab/blob/main/CV%20task%201\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Step 1: Import Libraries\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "import tensorflow as tf\n",
+        "from tensorflow.keras import layers, models\n",
+        "from tensorflow.keras.datasets import mnist\n",
+        "\n",
+        "# Step 2: Load Dataset\n",
+        "(train_images, train_labels), (test_images, test_labels) = mnist.load_data()\n",
+        "\n",
+        "# Step 3: Normalize\n",
+        "train_images = train_images / 255.0\n",
+        "test_images = test_images / 255.0\n",
+        "\n",
+        "# Step 4: Reshape (for CNN)\n",
+        "train_images = train_images.reshape((60000, 28, 28, 1))\n",
+        "test_images = test_images.reshape((10000, 28, 28, 1))\n",
+        "\n",
+        "# Step 5: Build CNN Model\n",
+        "model = models.Sequential([\n",
+        "    layers.Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)),\n",
+        "    layers.MaxPooling2D((2,2)),\n",
+        "\n",
+        "    layers.Conv2D(64, (3,3), activation='relu'),\n",
+        "    layers.MaxPooling2D((2,2)),\n",
+        "\n",
+        "    layers.Flatten(),\n",
+        "    layers.Dense(64, activation='relu'),\n",
+        "    layers.Dense(10, activation='softmax')\n",
+        "])\n",
+        "\n",
+        "# Step 6: Compile Model\n",
+        "model.compile(optimizer='adam',\n",
+        "              loss='sparse_categorical_crossentropy',\n",
+        "              metrics=['accuracy'])\n",
+        "\n",
+        "# Step 7: Train Model\n",
+        "model.fit(train_images, train_labels, epochs=3, validation_data=(test_images, test_labels))\n",
+        "\n",
+        "# Step 8: Select One Test Image\n",
+        "index = 0\n",
+        "test_img = test_images[index]\n",
+        "true_label = test_labels[index]\n",
+        "\n",
+        "# Step 9: Display Image\n",
+        "plt.imshow(test_img.squeeze(), cmap='gray')\n",
+        "plt.title(f\"True Label: {true_label}\")\n",
+        "plt.axis('off')\n",
+        "plt.show()\n",
+        "\n",
+        "# Step 10: Prepare Image\n",
+        "input_img = np.expand_dims(test_img, axis=0)\n",
+        "\n",
+        "# Step 11: Predict\n",
+        "prediction = model.predict(input_img)\n",
+        "\n",
+        "# Step 12: Output\n",
+        "predicted_class = np.argmax(prediction)\n",
+        "confidence = np.max(prediction)\n",
+        "\n",
+        "print(\"Predicted Class:\", predicted_class)\n",
+        "print(\"Actual Class:\", true_label)\n",
+        "print(\"Confidence:\", confidence)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 608
+        },
+        "id": "sh3Af692srvc",
+        "outputId": "0a094ddf-12ac-4740-b9f8-8f765853e406"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "metadata": {
+            "tags": null
+          },
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz\n",
+            "\u001b[1m11490434/11490434\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 0us/step\n"
+          ]
+        },
+        {
+          "metadata": {
+            "tags": null
+          },
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "/usr/local/lib/python3.12/dist-packages/keras/src/layers/convolutional/base_conv.py:113: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.\n",
+            "  super().__init__(activity_regularizer=activity_regularizer, **kwargs)\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Epoch 1/3\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m55s\u001b[0m 28ms/step - accuracy: 0.9549 - loss: 0.1481 - val_accuracy: 0.9837 - val_loss: 0.0514\n",
+            "Epoch 2/3\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m49s\u001b[0m 26ms/step - accuracy: 0.9849 - loss: 0.0487 - val_accuracy: 0.9878 - val_loss: 0.0332\n",
+            "Epoch 3/3\n",
+            "\u001b[1m1875/1875\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m82s\u001b[0m 26ms/step - accuracy: 0.9900 - loss: 0.0322 - val_accuracy: 0.9850 - val_loss: 0.0456\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 640x480 with 1 Axes>"
+            ],
+            "image/png": "iVBORw0KGgoAAAANSUhEUgAAAYUAAAGbCAYAAAAr/4yjAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvlHJYcgAAAAlwSFlzAAAPYQAAD2EBqD+naQAAD5dJREFUeJzt3GuM1NUZwOF3XLxw8YJiwRi5uGIkbZRKbIwXwAh11cZUwZVUE7BRa1xNGyNtMVEkSozGDwZjNH5qqdjGa0MaLxAU+QDEVBuktFUuS8RKFQQaFAmXPf1geNNlAfc/7LIKz5Ns4oznnTmgmR9nZvjXSiklACAijurpDQDw7SEKACRRACCJAgBJFABIogBAEgUAkigAkEQBgCQK0AkPPPBA1Gq12LhxY5c95pQpU2Lo0KFd9njQFUSBymq1Wqd+Fi5c2KP7HDt2bPzgBz/o0T10l4ULFx7w937mzJk9vUW+o3r19Ab47vnDH/7Q7vbs2bNj/vz5He4fMWLEodzWEWXEiBEdfr8jvv5vM2/evPjxj3/cA7vicCAKVHbTTTe1u7106dKYP39+h/v3tm3btujTp093bu2IMXDgwH3+fs+YMSOGDx8eF1xwQQ/sisOBt4/oFnveunn33Xdj9OjR0adPn7j33nsj4uu3nx544IEOM0OHDo0pU6a0u2/Lli3xq1/9Ks4444w49thj46yzzopHHnkk2traumSf77//fkyZMiXOPPPMOO6442LQoEHx85//PD7//PN9rt+4cWM0NzfHCSecEKecckr88pe/jO3bt3dY9+yzz8aoUaOid+/ecfLJJ8ekSZNi3bp137if9evXx7/+9a/YuXNn5V/LO++8E6tWrYobb7yx8izs4aRAt/n888/jyiuvjEmTJsVNN90UAwcOrDS/bdu2GDNmTPz73/+OX/ziFzF48OBYvHhxTJs2LdavXx+PP/74Qe9x/vz5sWbNmrj55ptj0KBBsWLFinjmmWdixYoVsXTp0qjVau3WNzc3x9ChQ+Phhx+OpUuXxqxZs2Lz5s0xe/bsXDNz5sy47777orm5OW655ZbYsGFDPPHEEzF69Oj429/+FieddNJ+9zNt2rT4/e9/H62trZU/hJ4zZ05EhChwcAocpJaWlrL3/0pjxowpEVGefvrpDusjokyfPr3D/UOGDCmTJ0/O2w8++GDp27dv+fDDD9ut++1vf1saGhrKRx99dMB9jRkzpnz/+98/4Jpt27Z1uO+Pf/xjiYiyaNGivG/69OklIso111zTbu0dd9xRIqIsW7aslFLK2rVrS0NDQ5k5c2a7dcuXLy+9evVqd//kyZPLkCFD2q2bPHlyiYjS2tp6wH3vbdeuXWXgwIHlRz/6UaU52Ju3j+g2xx57bNx88811z7/wwgtx6aWXRv/+/WPjxo35M27cuNi9e3csWrTooPfYu3fv/Oft27fHxo0b48ILL4yIiPfee6/D+paWlna377rrroiIePXVVyMi4uWXX462trZobm5ut+dBgwbF8OHD46233jrgfn73u99FKaXyKWHBggXx6aefOiVw0Lx9RLc5/fTT45hjjql7fuXKlfH+++/Hqaeeus9//9lnn9X92Hts2rQpZsyYEX/60586PN5///vfDuuHDx/e7nZjY2McddRRsXbt2txzKaXDuj2OPvrog97zvsyZMycaGhrihhtu6JbH58ghCnSb//9TeGfs3r273e22trYYP358/PrXv97n+rPPPrvuve3R3NwcixcvjqlTp8bIkSOjX79+0dbWFk1NTZ36MHvvzxza2tqiVqvFa6+9Fg0NDR3W9+vX76D3vLevvvoqXnnllRg3blzlz21gb6LAIde/f//YsmVLu/t27NgR69evb3dfY2NjfPHFFzFu3Lhu2cfmzZtjwYIFMWPGjLj//vvz/pUrV+53ZuXKlTFs2LC8vWrVqmhra8u3exobG6OUEsOGDeuSaHXG3LlzY+vWrd46okv4TIFDrrGxscPnAc8880yHk0Jzc3MsWbIk3njjjQ6PsWXLlti1a9dB7WPPn+RLKe3uP9C3mp588sl2t5944omIiLjyyisjIuK6666LhoaGmDFjRofHLaXs96uue9TzldTnnnsu+vTpE9dee22nZ2B/nBQ45G655Za4/fbbY8KECTF+/PhYtmxZvPHGGzFgwIB266ZOnRpz586Nn/zkJzFlypQYNWpUfPnll7F8+fJ48cUXY+3atR1m9rZhw4Z46KGHOtw/bNiwuPHGG2P06NHx6KOPxs6dO+P000+PefPmRWtr634fr7W1Na655ppoamqKJUuWxLPPPhs/+9nP4rzzzouIr4P30EMPxbRp02Lt2rXx05/+NI4//vhobW2NV155JW677ba455579vv4Vb+SumnTpnjt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\n"
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1m1/1\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 89ms/step\n",
+            "Predicted Class: 7\n",
+            "Actual Class: 7\n",
+            "Confidence: 0.99999726\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
